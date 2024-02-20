@@ -8,7 +8,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "users")
+@Table(name = "tokens")
 public class JwtToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
