@@ -3,11 +3,14 @@ package com.chris.loginsecurity.api.exceptions;
 import com.chris.loginsecurity.api.models.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +29,24 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
+    public ResponseEntity<ApiResponse> handlerException(AuthenticationCredentialsNotFoundException ex, WebRequest webRequest){
+        ApiResponse response = new ApiResponse("No se encontraron credenciales de autenticacion. Porfavor inicie sesion para acceder a esta funcion.",HttpStatus.UNAUTHORIZED, webRequest.getDescription(false),ex.getMessage() );
+        return new ResponseEntity<>(response,HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse> handlerException(AccessDeniedException ex, WebRequest webRequest){
+        ApiResponse response = new ApiResponse("Acceso denegado. No tienes los permisos necesarios para acceder a esta función.",HttpStatus.FORBIDDEN, webRequest.getDescription(false),ex.getMessage() );
+        return new ResponseEntity<>(response,HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse> handlerException(BadCredentialsException ex, WebRequest webRequest){
+        ApiResponse response = new ApiResponse("Credenciales de autenticacion incorrectas. Porfavor verifique su registro e intente nuevamente.",HttpStatus.BAD_REQUEST, webRequest.getDescription(false),ex.getMessage() );
+        return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse> handlerMethodArgumentNotValidException(MethodArgumentNotValidException ex,WebRequest webRequest){
         Map<String,String> errors = new HashMap<>();
@@ -33,7 +54,6 @@ public class GlobalExceptionHandler {
         ApiResponse response = new ApiResponse("Los datos proporcionados no son válidos.",  HttpStatus.BAD_REQUEST,webRequest.getDescription(false),errors);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-
 
 
 
