@@ -1,12 +1,18 @@
 package com.chris.loginsecurity.api.services;
 
+import com.chris.loginsecurity.api.exceptions.ResourceNotFoundException;
 import com.chris.loginsecurity.api.mapper.UserMapper;
+import com.chris.loginsecurity.api.models.dto.AuthResponse;
 import com.chris.loginsecurity.api.models.dto.RegisteredUser;
 import com.chris.loginsecurity.api.models.dto.RegisteredUserDTO;
+import com.chris.loginsecurity.api.models.dto.UserRequest;
 import com.chris.loginsecurity.api.models.entity.JwtToken;
 import com.chris.loginsecurity.api.models.entity.User;
 import com.chris.loginsecurity.api.repositories.TokenRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +24,7 @@ public class AuthenticationService {
     private TokenRepository tokenRepository;
     private UserMapper userMapper;
     private UserService userService;
+    private AuthenticationManager authManager;
     private JwtService jwtService;
 
     @Transactional
@@ -44,5 +51,18 @@ public class AuthenticationService {
                 "username",user.getUsername(),
                 "authorities",user.getAuthorities()
         );
+    }
+
+    public AuthResponse login(UserRequest userRequest) {
+        Authentication auth =  new UsernamePasswordAuthenticationToken(
+                userRequest.getUsername(),userRequest.getPassword()
+        );
+        authManager.authenticate(auth);
+        User user = userService.findByUsername(userRequest.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("user","username",userRequest.getUsername()));
+        String jwt = jwtService.generateToken(user,generateExtraClaims(user));
+        saveToken(jwt,user);
+
+        return new AuthResponse(jwt);
     }
 }
