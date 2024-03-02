@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -54,4 +55,11 @@ public class JwtService {
     }
 
 
+    public String extractTokenFromRequest(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")){
+            return null;
+        }
+        return authorizationHeader.substring(7);
+    }
 }

@@ -1,6 +1,7 @@
 package com.chris.loginsecurity.api.controllers;
 
 import com.chris.loginsecurity.api.models.dto.AuthResponse;
+import com.chris.loginsecurity.api.models.dto.UserDTO;
 import com.chris.loginsecurity.api.models.dto.UserRequest;
 import com.chris.loginsecurity.api.services.AuthenticationService;
 import lombok.AllArgsConstructor;
@@ -23,4 +24,11 @@ public class AuthController {
         AuthResponse response = authenticationService.login(userRequest);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping("profile")
+    public ResponseEntity<UserDTO> findLoggerUser(){
+        UserDTO userDTO = authenticationService.findLoggerUser();
+        return new ResponseEntity<>(userDTO,HttpStatus.OK);
+    }
+
 }

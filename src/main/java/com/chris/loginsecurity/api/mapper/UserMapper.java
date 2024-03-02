@@ -2,6 +2,7 @@ package com.chris.loginsecurity.api.mapper;
 
 import com.chris.loginsecurity.api.models.dto.RegisteredUser;
 import com.chris.loginsecurity.api.models.dto.RegisteredUserDTO;
+import com.chris.loginsecurity.api.models.dto.UserDTO;
 import com.chris.loginsecurity.api.models.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,6 +18,9 @@ public interface UserMapper{
 
     @Mapping(target = "token", ignore = true)
     RegisteredUserDTO userToRegisteredUserDTO(User user);
+
+
+    UserDTO userToUserDTO(User user);
 
 
 }
